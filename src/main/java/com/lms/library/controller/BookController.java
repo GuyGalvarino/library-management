@@ -23,7 +23,7 @@ public class BookController {
 	}
 
 	@GetMapping("/books/{bookId}")
-	public ResponseEntity<?> getBook(@PathVariable String bookId) {
+	public ResponseEntity<?> getBook(@PathVariable Integer bookId) {
 		Book result = bookService.getBook(bookId);
 		if (result == null) {
 			return ResponseEntity.status(404).build();

@@ -1,12 +1,11 @@
 package com.lms.library.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,17 +13,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lms.library.entities.Book;
 import com.lms.library.entities.User;
-import com.lms.library.services.BookService;
 import com.lms.library.services.UserService;
 
 @RestController
 public class UserController {
 	@Autowired
 	private UserService userService;
-	@Autowired
-	private BookService bookService;
 
 	private static class LoginRequest {
 		String email;
@@ -40,25 +35,19 @@ public class UserController {
 	}
 
 	private static class UserResponse {
-		private String userId;
+		private Integer userId;
 		private String name;
 		private String email;
 		private String token;
-		private List<Book> issuedBooks;
 
 		@SuppressWarnings("unused")
-		public String getUserId() {
+		public Integer getUserId() {
 			return userId;
 		}
 
 		@SuppressWarnings("unused")
 		public String getName() {
 			return name;
-		}
-
-		@SuppressWarnings("unused")
-		public List<Book> getIssuedBooks() {
-			return issuedBooks;
 		}
 
 		@SuppressWarnings("unused")
@@ -71,12 +60,11 @@ public class UserController {
 			return email;
 		}
 
-		UserResponse(String userId, String name, String email, List<Book> issuedBooks, String token) {
+		UserResponse(Integer userId, String name, String email, String token) {
 			super();
 			this.userId = userId;
 			this.name = name;
 			this.email = email;
-			this.issuedBooks = issuedBooks;
 			this.token = token;
 		}
 	}
@@ -107,36 +95,34 @@ public class UserController {
 	
 	@GetMapping("/users/{email}")
 	public ResponseEntity<?> getUser(@PathVariable String email, @RequestHeader String authorization) {
-		if (!email.equals(authorization)) {
-			return ResponseEntity.status(403).build();
-		}
-		User user = userService.getUser(email);
+		User user = userService.getUserByEmail(email);
 		if (user == null) {
 			return ResponseEntity.status(404).build();
 		}
-		// populating the books
-		List<Book> issuedBooks = populateBooks(user.getIssuedBooks());
+		// TODO token-based authorization
+		if (!user.getUserId().equals(Integer.parseInt(authorization))) {
+			return ResponseEntity.status(403).build();
+		}
 		String token = authorization;
 		return ResponseEntity
-				.of(Optional.of(new UserResponse(user.getUserId(), user.getName(), user.getEmail(), issuedBooks, token)));
+				.of(Optional.of(new UserResponse(user.getUserId(), user.getName(), user.getEmail(), token)));
 	}
 
 	@PostMapping(path = "/users/login", consumes = "application/json")
 	public ResponseEntity<?> loginUser(@RequestBody LoginRequest request) {
 		String email = request.getEmail();
 		String password = request.getPassword();
-		User user = userService.getUser(email);
+		User user = userService.getUserByEmail(email);
 		if (user == null) {
 			return ResponseEntity.status(404).build();
 		}
 		if (!user.getPasswordHash().equals(password)) {
 			return ResponseEntity.status(403).build();
 		}
-		// populating the books
-		List<Book> issuedBooks = populateBooks(user.getIssuedBooks());
-		String token = user.getUserId();
+		// TODO token-based authorization
+		String token = user.getUserId().toString();
 		return ResponseEntity.of(
-				Optional.of(new UserResponse(user.getUserId(), user.getName(), user.getEmail(), issuedBooks, token)));
+				Optional.of(new UserResponse(user.getUserId(), user.getName(), user.getEmail(), token)));
 	}
 
 	@PostMapping(path = "/users/signin", consumes = "application/json")
@@ -148,18 +134,19 @@ public class UserController {
 		if (user == null) {
 			return ResponseEntity.status(400).build();
 		}
-		List<Book> issuedBooks = populateBooks(user.getIssuedBooks());
-		String token = user.getUserId();
+		String token = user.getUserId().toString();
 		return ResponseEntity.of(
-				Optional.of(new UserResponse(user.getUserId(), user.getName(), user.getEmail(), issuedBooks, token)));
+				Optional.of(new UserResponse(user.getUserId(), user.getName(), user.getEmail(), token)));
 	}
 
-	// method to populate the books list from their IDs
-	List<Book> populateBooks(Set<String> bookIds) {
-		List<Book> issuedBooks = new ArrayList<>();
-		for (String bookId : bookIds) {
-			issuedBooks.add(bookService.getBook(bookId));
+	@DeleteMapping(path = "/users/{userId}")
+	public ResponseEntity<?> deleteUser(@RequestBody Integer userId, @RequestHeader String authorization) {
+		// TODO token-based authorization
+		if (!userId.equals(Integer.parseInt(authorization))) {
+			return ResponseEntity.status(403).build();
 		}
-		return issuedBooks;
+		User deletedUser = userService.deleteUser(userId);
+		return ResponseEntity.of(
+				Optional.of(new UserResponse(deletedUser.getUserId(), deletedUser.getName(), deletedUser.getEmail(), "")));
 	}
 }

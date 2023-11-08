@@ -1,24 +1,37 @@
 package com.lms.library.entities;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+//import jakarta.persistence.SequenceGenerator;
+
+@Entity
 public class Book {
-	String bookId;
+	@Id
+	@GeneratedValue (strategy = GenerationType.SEQUENCE)
+//	@SequenceGenerator (name="book_generator", sequenceName = "book_seq", allocationSize=50)
+	Integer bookId;
 	String name;
 	String author;
 	String publisher;
-
-	public Book(String bookId, String name, String author, String publisher) {
+	
+	public Book() {
 		super();
-		this.bookId = bookId;
+	}
+
+	public Book(String name, String author, String publisher) {
+		super();
 		this.name = name;
 		this.author = author;
 		this.publisher = publisher;
 	}
 
-	public String getBookId() {
+	public Integer getBookId() {
 		return bookId;
 	}
 
-	public void setBookId(String bookId) {
+	public void setBookId(Integer bookId) {
 		this.bookId = bookId;
 	}
 
@@ -44,6 +57,11 @@ public class Book {
 
 	public void setPublisher(String publisher) {
 		this.publisher = publisher;
+	}
+
+	@Override
+	public String toString() {
+		return "Book [bookId=" + bookId + ", name=" + name + ", author=" + author + ", publisher=" + publisher + "]";
 	}
 
 }

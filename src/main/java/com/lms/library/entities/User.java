@@ -3,27 +3,43 @@ package com.lms.library.entities;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "libraryusers")
 public class User {
-	private String userId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer userId;
 	private String name;
+	@Column(unique=true)
 	private String email;
-	private Set<String> issuedBooks;
+	private Set<Integer> issuedBooks;
 	private String passwordHash;
 
-	public User(String userId, String name, String email, String passwordHash) {
+	public User() {
 		super();
-		this.userId = userId;
+		this.issuedBooks = new HashSet<>();
+	}
+
+	public User(String name, String email, String passwordHash) {
+		super();
 		this.name = name;
 		this.email = email;
 		this.passwordHash = passwordHash;
 		this.issuedBooks = new HashSet<>();
 	}
 
-	public String getUserId() {
+	public Integer getUserId() {
 		return userId;
 	}
 
-	public void setUserId(String userId) {
+	public void setUserId(Integer userId) {
 		this.userId = userId;
 	}
 
@@ -43,11 +59,11 @@ public class User {
 		this.email = email;
 	}
 
-	public Set<String> getIssuedBooks() {
+	public Set<Integer> getIssuedBooks() {
 		return issuedBooks;
 	}
 
-	public void issueBook(String bookId) {
+	public void issueBook(Integer bookId) {
 		issuedBooks.add(bookId);
 	}
 

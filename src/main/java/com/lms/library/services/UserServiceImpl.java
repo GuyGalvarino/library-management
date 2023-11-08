@@ -1,59 +1,58 @@
 package com.lms.library.services;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
+import com.lms.library.dao.UserDao;
 import com.lms.library.entities.User;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class UserServiceImpl implements UserService {
-	private List<User> userList;
-	private static Integer counter = 0; // temporary, for generating unique userIDs
-
-	UserServiceImpl() {
-		// adding some dummy users for testing
-		userList = new ArrayList<>();
-		User user1 = new User("u123", "Suresh", "suresh@xyz.com", "aslhdalkjdslkjsdal");
-		user1.issueBook("a1234");
-		user1.issueBook("a1236");
-		User user2 = new User("u124", "Mukesh", "mukesh@yzz.com", "asljdhalkjsdlajsdl");
-		user2.issueBook("a1235");
-		User user3 = new User("u125", "Swapnil", "swapnil@yrl.com", "zxnkcbklsaodjlkafg");
-		user3.issueBook("a1237");
-		userList.add(user1);
-		userList.add(user2);
-		userList.add(user3);
-	}
+	@Autowired
+	private UserDao userDao;
 
 	@Override
-	public User getUser(String email) {
-		for (User user : userList) {
-			if (user.getEmail().equals(email)) {
-				return user;
-			}
-		}
+	public User createUser(String name, String email, String password) {
+		User newUser = new User(name, email, password);
+		userDao.save(newUser);
 		return null;
 	}
 
 	@Override
-	public User createUser(String name, String email, String password) {
-		if(getUser(email) == null) {
-			String userId = "u" + counter.toString();
-			counter++;
-			User newUser = new User(userId, name, email, password);	
-			userList.add(newUser);
-			return newUser;
+	public User getUserByEmail(String email) {
+		return userDao.findOne(Example.of(new User("", email, ""))).orElse(null);
+	}
+
+	@Override
+	public User getUser(Integer userId) {
+		try {
+			return userDao.getReferenceById(userId);
+		} catch (EntityNotFoundException e) {
+			System.out.println("User does not exist");
 		}
 		return null;
 	}
 
 	@Override
 	public List<User> getUsers() {
-		return userList;
+		return userDao.findAll();
 	}
-	
-	
+
+	@Override
+	public User deleteUser(Integer userId) {
+		try {
+			User deletedUser = userDao.getReferenceById(userId);
+			userDao.deleteById(userId);
+			return deletedUser;
+		} catch (EntityNotFoundException e) {
+			System.out.println("User does not exist");
+		}
+		return null;
+	}
 
 }
