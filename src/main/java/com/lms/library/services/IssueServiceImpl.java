@@ -64,6 +64,7 @@ public class IssueServiceImpl implements IssueService {
 			return null;
 		}
 		fetchedUser.removeBook(bookId);
-		return null;
+		userDao.save(fetchedUser);
+		return bookService.getBook(bookId);
 	}
 }
