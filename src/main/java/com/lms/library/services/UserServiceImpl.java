@@ -3,13 +3,10 @@ package com.lms.library.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 import com.lms.library.dao.UserDao;
 import com.lms.library.entities.User;
-
-import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -19,23 +16,19 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User createUser(String name, String email, String password) {
 		User newUser = new User(name, email, password);
-		userDao.save(newUser);
-		return null;
+		return userDao.save(newUser);
 	}
 
 	@Override
 	public User getUserByEmail(String email) {
-		return userDao.findOne(Example.of(new User("", email, ""))).orElse(null);
+		User user = userDao.findByEmail(email).orElse(null);
+		System.out.println(user);
+		return user;
 	}
 
 	@Override
 	public User getUser(Integer userId) {
-		try {
-			return userDao.getReferenceById(userId);
-		} catch (EntityNotFoundException e) {
-			System.out.println("User does not exist");
-		}
-		return null;
+		return userDao.findById(userId).orElse(null);
 	}
 
 	@Override
@@ -45,14 +38,11 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public User deleteUser(Integer userId) {
-		try {
-			User deletedUser = userDao.getReferenceById(userId);
+		User deletedUser = userDao.findById(userId).orElse(null);
+		if (deletedUser != null) {
 			userDao.deleteById(userId);
-			return deletedUser;
-		} catch (EntityNotFoundException e) {
-			System.out.println("User does not exist");
 		}
-		return null;
+		return deletedUser;
 	}
 
 }

@@ -10,7 +10,6 @@ import jakarta.persistence.Id;
 public class Book {
 	@Id
 	@GeneratedValue (strategy = GenerationType.SEQUENCE)
-//	@SequenceGenerator (name="book_generator", sequenceName = "book_seq", allocationSize=50)
 	Integer bookId;
 	String name;
 	String author;
@@ -26,7 +25,7 @@ public class Book {
 		this.author = author;
 		this.publisher = publisher;
 	}
-
+	
 	public Integer getBookId() {
 		return bookId;
 	}

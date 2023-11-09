@@ -6,14 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.lms.library.dao.BookDao;
+import com.lms.library.dao.UserDao;
 import com.lms.library.entities.Book;
-
-import jakarta.persistence.EntityNotFoundException;
+import com.lms.library.entities.User;
 
 @Service
 public class BookServiceImpl implements BookService {
 	@Autowired
 	private BookDao bookDao;
+	@Autowired
+	private UserDao userDao;
 
 	@Override
 	public List<Book> getBooks() {
@@ -22,12 +24,7 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	public Book getBook(Integer bookId) {
-		try {
-			return bookDao.getReferenceById(bookId);
-		} catch (EntityNotFoundException e) {
-			System.out.println("Book does not exist");
-		}
-		return null;
+		return bookDao.findById(bookId).orElse(null);
 	}
 
 	@Override
@@ -41,4 +38,19 @@ public class BookServiceImpl implements BookService {
 		return null;
 	}
 
+	@Override
+	public Book removeBook(Integer bookId) {
+		Book book = bookDao.findById(bookId).orElse(null);
+		if (book == null) {
+			return null;
+		}
+		// removing the book from all the users who issued it
+		List<User> userList = userDao.findAll();
+		for (User user : userList) {
+			user.removeBook(bookId);
+		}
+		userDao.saveAll(userList);
+		bookDao.deleteById(bookId);
+		return book;
+	}
 }

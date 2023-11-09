@@ -8,4 +8,5 @@ public interface BookService {
 	List<Book> getBooks();
 	Book getBook(Integer bookId);
 	Book addBook(String name, String author, String publisher);
+	Book removeBook(Integer bookId);
 }

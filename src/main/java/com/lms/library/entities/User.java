@@ -14,7 +14,7 @@ import jakarta.persistence.Table;
 @Table(name = "libraryusers")
 public class User {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Integer userId;
 	private String name;
 	@Column(unique = true)
@@ -33,6 +33,14 @@ public class User {
 		this.email = email;
 		this.passwordHash = passwordHash;
 		this.issuedBooks = new HashSet<>();
+	}
+
+	
+	
+	@Override
+	public String toString() {
+		return "User [userId=" + userId + ", name=" + name + ", email=" + email + ", issuedBooks=" + issuedBooks
+				+ ", passwordHash=" + passwordHash + "]";
 	}
 
 	public Integer getUserId() {
@@ -68,8 +76,9 @@ public class User {
 	}
 
 	public Integer removeBook(Integer bookId) {
+		Boolean returnBookId = issuedBooks.contains(bookId);
 		issuedBooks.remove(bookId);
-		return bookId;
+		return returnBookId ? bookId : -1;
 	}
 
 	public String getPasswordHash() {

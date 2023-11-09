@@ -11,8 +11,6 @@ import com.lms.library.dao.UserDao;
 import com.lms.library.entities.Book;
 import com.lms.library.entities.User;
 
-import jakarta.persistence.EntityNotFoundException;
-
 @Service
 public class IssueServiceImpl implements IssueService {
 	@Autowired
@@ -24,11 +22,9 @@ public class IssueServiceImpl implements IssueService {
 
 	@Override
 	public List<Book> getIssues(Integer userId) {
-		// TODO Auto-generated method stub
-		try {
-			Set<Integer> bookIds = userDao.getReferenceById(userId).getIssuedBooks();
-			return populateBooks(bookIds);
-		} catch (EntityNotFoundException e) {
+		User user = userDao.findById(userId).orElse(null);
+		if (user != null) {
+			return populateBooks(user.getIssuedBooks());
 		}
 		return null;
 	}
@@ -63,8 +59,8 @@ public class IssueServiceImpl implements IssueService {
 		if (fetchedUser == null) {
 			return null;
 		}
-		fetchedUser.removeBook(bookId);
+		Integer result = fetchedUser.removeBook(bookId);
 		userDao.save(fetchedUser);
-		return bookService.getBook(bookId);
+		return result == -1 ? null : bookService.getBook(bookId);
 	}
 }
