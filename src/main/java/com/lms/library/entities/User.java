@@ -17,7 +17,7 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer userId;
 	private String name;
-	@Column(unique=true)
+	@Column(unique = true)
 	private String email;
 	private Set<Integer> issuedBooks;
 	private String passwordHash;
@@ -65,6 +65,11 @@ public class User {
 
 	public void issueBook(Integer bookId) {
 		issuedBooks.add(bookId);
+	}
+
+	public Integer removeBook(Integer bookId) {
+		issuedBooks.remove(bookId);
+		return bookId;
 	}
 
 	public String getPasswordHash() {

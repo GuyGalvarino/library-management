@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.lms.library.dao.UserDao;
 import com.lms.library.entities.Book;
+import com.lms.library.entities.User;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -17,16 +18,17 @@ public class IssueServiceImpl implements IssueService {
 	@Autowired
 	private BookService bookService;
 	@Autowired
+	private UserService userService;
+	@Autowired
 	private UserDao userDao;
 
 	@Override
 	public List<Book> getIssues(Integer userId) {
 		// TODO Auto-generated method stub
 		try {
-			Set<Integer> bookIds = userDao.getReferenceById(userId).getIssuedBooks();			
-			return populateBooks(bookIds);			
-		}
-		catch(EntityNotFoundException e) {
+			Set<Integer> bookIds = userDao.getReferenceById(userId).getIssuedBooks();
+			return populateBooks(bookIds);
+		} catch (EntityNotFoundException e) {
 		}
 		return null;
 	}
@@ -38,5 +40,30 @@ public class IssueServiceImpl implements IssueService {
 			issuedBooks.add(bookService.getBook(bookId));
 		}
 		return issuedBooks;
+	}
+
+	@Override
+	public Book addIssue(Integer bookId, Integer userId) {
+		Book fetchedBook = bookService.getBook(bookId);
+		if (fetchedBook == null) {
+			return null;
+		}
+		User fetchedUser = userService.getUser(userId);
+		if (fetchedUser == null) {
+			return null;
+		}
+		fetchedUser.issueBook(bookId);
+		userDao.save(fetchedUser);
+		return fetchedBook;
+	}
+
+	@Override
+	public Book removeIssue(Integer bookId, Integer userId) {
+		User fetchedUser = userService.getUser(userId);
+		if (fetchedUser == null) {
+			return null;
+		}
+		fetchedUser.removeBook(bookId);
+		return null;
 	}
 }
