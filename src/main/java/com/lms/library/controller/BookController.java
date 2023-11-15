@@ -25,7 +25,6 @@ public class BookController {
 	@GetMapping("/books/{bookId}")
 	public ResponseEntity<?> getBook(@PathVariable Integer bookId) {
 		Book result = bookService.getBook(bookId);
-		System.out.println("HERE! " + result);
 		if (result == null) {
 			return ResponseEntity.status(404).build();
 		}

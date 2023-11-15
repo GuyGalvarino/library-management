@@ -12,9 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.lms.library.entities.Otp;
 import com.lms.library.entities.User;
 import com.lms.library.services.AuthorizationService;
+import com.lms.library.services.OtpService;
 import com.lms.library.services.UserService;
+
+import at.favre.lib.crypto.bcrypt.BCrypt;
 
 @RestController
 public class UserController {
@@ -22,6 +26,8 @@ public class UserController {
 	private UserService userService;
 	@Autowired
 	private AuthorizationService authorizationService;
+	@Autowired
+	private OtpService otpService;
 
 	private static class LoginRequest {
 		String email;
@@ -96,6 +102,22 @@ public class UserController {
 		}
 	}
 
+	private static class VerifyRequest {
+		String otp;
+
+		public String getOtp() {
+			return otp;
+		}
+	}
+
+	public static class SigninUnverifiedResponse {
+		String message = "A OTP has been sent to your email";
+
+		public String getMessage() {
+			return message;
+		}
+	}
+
 	@GetMapping("/users/{email}")
 	public ResponseEntity<?> getUser(@PathVariable String email, @RequestHeader String authorization) {
 		User user = userService.getUserByEmail(email);
@@ -113,13 +135,12 @@ public class UserController {
 	public ResponseEntity<?> loginUser(@RequestBody LoginRequest request) {
 		String email = request.getEmail();
 		String password = request.getPassword();
-		System.out.println(email);
-		System.out.println(password);
 		User user = userService.getUserByEmail(email);
 		if (user == null) {
 			return ResponseEntity.status(404).build();
 		}
-		if (!user.getPasswordHash().equals(password)) {
+		BCrypt.Result result = BCrypt.verifyer().verify(password.toCharArray(), user.getPasswordHash());
+		if (!result.verified) {
 			return ResponseEntity.status(403).build();
 		}
 		Integer userId = user.getUserId();
@@ -133,10 +154,23 @@ public class UserController {
 		String name = request.getName();
 		String email = request.getEmail();
 		String password = request.getPassword();
-		User user = userService.createUser(name, email, password);
-		if (user == null) {
+
+		if (userService.getUserByEmail(email) != null) {
 			return ResponseEntity.status(400).build();
 		}
+
+		otpService.sendOtp(email, name, password);
+		return ResponseEntity.of(Optional.of(new SigninUnverifiedResponse()));
+	}
+
+	@PostMapping(path = "/users/signin/verify/{email}", consumes = "application/json")
+	public ResponseEntity<?> verifyUser(@RequestBody VerifyRequest verifyRequest, @PathVariable String email) {
+		String otp = verifyRequest.getOtp();
+		Otp userOtp = otpService.verifyOtp(email, otp);
+		if (userOtp == null) {
+			return ResponseEntity.status(403).build();
+		}
+		User user = userService.createUser(userOtp.getName(), userOtp.getEmail(), userOtp.getPasswordHash());
 		Integer userId = user.getUserId();
 		String token = authorizationService.generateToken(userId);
 		return ResponseEntity
@@ -145,8 +179,7 @@ public class UserController {
 
 	@DeleteMapping("/users/{userId}")
 	public ResponseEntity<?> deleteUser(@PathVariable Integer userId, @RequestHeader String authorization) {
-		// TODO token-based authorization
-		if (!userId.equals(Integer.parseInt(authorization))) {
+		if (!authorizationService.verifyToken(userId, authorization)) {
 			return ResponseEntity.status(403).build();
 		}
 		User deletedUser = userService.deleteUser(userId);
