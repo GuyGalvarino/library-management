@@ -37,4 +37,20 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 		return parsedUserId.equals(userId);
 	}
 
+	@Override
+	public String generateAdminToken(String email) {
+		Instant now = Instant.now();
+		String jwtToken = Jwts.builder().claim("email", email).setId(UUID.randomUUID().toString())
+				.setIssuedAt(Date.from(now)).setExpiration(Date.from(now.plus(5l, ChronoUnit.MINUTES)))
+				.signWith(hmacKey).compact();
+		return jwtToken;
+	}
+
+	@Override
+	public Boolean verifyAdminToken(String email, String token) {
+		Jws<Claims> jwt = Jwts.parserBuilder().setSigningKey(hmacKey).build().parseClaimsJws(token);
+		String parsedEmail = jwt.getBody().get("email", String.class);
+		return parsedEmail.equals(email);
+	}
+
 }

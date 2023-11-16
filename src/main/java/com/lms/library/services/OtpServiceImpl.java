@@ -5,7 +5,9 @@ import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.lms.library.dao.AdminDao;
 import com.lms.library.dao.OtpDao;
+import com.lms.library.entities.Admin;
 import com.lms.library.entities.Otp;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
@@ -16,6 +18,8 @@ public class OtpServiceImpl implements OtpService {
     MailService mailService;
     @Autowired
     OtpDao otpDao;
+    @Autowired
+    AdminDao adminDao;
 
     @Override
     public void sendOtp(String email, String name, String password) {
@@ -29,14 +33,39 @@ public class OtpServiceImpl implements OtpService {
     }
 
     @Override
+    public void sendOtpAdmin(Admin admin) {
+        String otp = Integer.toString(new Random().nextInt(1000000));
+        while (otp.length() < 6) {
+            otp = "0" + otp;
+        }
+        admin.setOtp(otp);
+        adminDao.save(admin);
+        mailService.sendMail(admin.getEmail(), "LMS admin verification", "Your OTP is " + otp);
+    }
+
+    @Override
     public Otp verifyOtp(String email, String otp) {
         Otp userOtp = otpDao.findById(email).orElse(null);
         if (userOtp == null) {
             return null;
         }
-        if(userOtp.getOtp().equals(otp)) {
+        if (userOtp.getOtp().equals(otp)) {
             otpDao.deleteById(email);
             return userOtp;
+        }
+        return null;
+    }
+
+    @Override
+    public Admin verifyOtpAdmin(String email, String otp) {
+        Admin admin = adminDao.findById(email).orElse(null);
+        if (admin == null) {
+            return null;
+        }
+        if (admin.getOtp().equals(otp)) {
+            admin.setOtp(null);
+            adminDao.save(admin);
+            return admin;
         }
         return null;
     }

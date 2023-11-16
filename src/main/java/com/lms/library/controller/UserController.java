@@ -1,5 +1,6 @@
 package com.lms.library.controller;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,6 +130,12 @@ public class UserController {
 			return ResponseEntity.status(403).build();
 		}
 		return ResponseEntity.of(Optional.of(new UserResponse(user.getUserId(), user.getName(), user.getEmail())));
+	}
+
+	@GetMapping("/users") // temporary for checking the users in the database
+	public List<User> getUsers() {
+		List<User> userList = userService.getUsers();
+		return userList;
 	}
 
 	@PostMapping(path = "/users/login", consumes = "application/json")
