@@ -105,9 +105,13 @@ public class UserController {
 
 	private static class VerifyRequest {
 		String otp;
+		String email;
 
 		public String getOtp() {
 			return otp;
+		}
+		public String getEmail() {
+			return email;
 		}
 	}
 
@@ -170,9 +174,10 @@ public class UserController {
 		return ResponseEntity.of(Optional.of(new SigninUnverifiedResponse()));
 	}
 
-	@PostMapping(path = "/users/signin/verify/{email}", consumes = "application/json")
-	public ResponseEntity<?> verifyUser(@RequestBody VerifyRequest verifyRequest, @PathVariable String email) {
+	@PostMapping(path = "/users/verify-otp", consumes = "application/json")
+	public ResponseEntity<?> verifyUser(@RequestBody VerifyRequest verifyRequest) {
 		String otp = verifyRequest.getOtp();
+		String email = verifyRequest.getEmail();
 		Otp userOtp = otpService.verifyOtp(email, otp);
 		if (userOtp == null) {
 			return ResponseEntity.status(403).build();

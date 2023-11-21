@@ -14,9 +14,9 @@ public class LibraryManagementSystemApplication {
 		System.out.println("Up and running!");
 	}
 
-	// for CORS
-	@Bean
-	public WebMvcConfigurer corsConfigurer() {
+    // for CORS
+    @Bean
+    WebMvcConfigurer corsConfigurer() {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {

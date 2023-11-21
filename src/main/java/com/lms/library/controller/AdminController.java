@@ -2,7 +2,6 @@ package com.lms.library.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,9 +38,13 @@ public class AdminController {
 
 	private static class TokenRequest {
 		private String otp;
+		private String email;
 
 		public String getOtp() {
 			return otp;
+		}
+		public String getEmail() {
+			return email;
 		}
 	}
 
@@ -97,9 +100,10 @@ public class AdminController {
 		return ResponseEntity.ok(new OtpResponse());
 	}
 
-	@PostMapping("/admin/verify/{email}")
-	public ResponseEntity<?> validateAdminLogin(@RequestBody TokenRequest tokenRequest, @PathVariable String email) {
+	@PostMapping("/admin/verify-otp")
+	public ResponseEntity<?> validateAdminLogin(@RequestBody TokenRequest tokenRequest) {
 		String otp = tokenRequest.getOtp();
+		String email = tokenRequest.getEmail();
 		Admin admin = otpService.verifyOtpAdmin(email, otp);
 		if (admin == null) {
 			return ResponseEntity.status(404).build();
