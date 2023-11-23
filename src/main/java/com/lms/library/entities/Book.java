@@ -25,6 +25,10 @@ public class Book {
 		this.publisher = publisher;
 	}
 	
+	public Book(int i, String string, String string2, String string3) {
+		// TODO Auto-generated constructor stub
+	}
+
 	public Integer getBookId() {
 		return bookId;
 	}

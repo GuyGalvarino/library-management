@@ -176,17 +176,33 @@ public class UserController {
 
 	@PostMapping(path = "/users/verify-otp", consumes = "application/json")
 	public ResponseEntity<?> verifyUser(@RequestBody VerifyRequest verifyRequest) {
-		String otp = verifyRequest.getOtp();
-		String email = verifyRequest.getEmail();
-		Otp userOtp = otpService.verifyOtp(email, otp);
-		if (userOtp == null) {
-			return ResponseEntity.status(403).build();
-		}
-		User user = userService.createUser(userOtp.getName(), userOtp.getEmail(), userOtp.getPasswordHash());
-		Integer userId = user.getUserId();
-		String token = authorizationService.generateToken(userId);
-		return ResponseEntity
-				.of(Optional.of(new UserResponseWithToken(user.getUserId(), user.getName(), user.getEmail(), token)));
+		    String otp = verifyRequest.getOtp();
+		    String email = verifyRequest.getEmail();
+		    Otp userOtp = otpService.verifyOtp(email, otp);
+
+		    if (userOtp == null) {
+		        return ResponseEntity.status(403).build();
+		    }
+
+		    // Check if the user already exists
+		    User existingUser = userService.getUserByEmail(email);
+		    if (existingUser != null) {
+		        return ResponseEntity.status(400).build(); // User already verified
+		    }
+
+		    // Create the user
+		    User user = userService.createUser(userOtp.getName(), userOtp.getEmail(), userOtp.getPasswordHash());
+
+		    // Check if the user creation was successful
+		    if (user == null) {
+		        return ResponseEntity.status(500).build(); // Server error
+		    }
+
+		    Integer userId = user.getUserId();
+		    String token = authorizationService.generateToken(userId);
+
+		    return ResponseEntity
+		            .of(Optional.of(new UserResponseWithToken(user.getUserId(), user.getName(), user.getEmail(), token)));
 	}
 
 	@DeleteMapping("/users/{userId}")

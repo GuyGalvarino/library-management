@@ -29,7 +29,7 @@ public class BookController {
 		return bookService.getBooks();
 	}
 
-	private static class BookRequest {
+	public static class BookRequest {
 		private String name;
 		private String author;
 		private String publisher;
@@ -51,9 +51,18 @@ public class BookController {
 			return publisher;
 		}
 
+		public BookRequest(String name, String author, String publisher, String adminEmail) {
+			super();
+			this.name = name;
+			this.author = author;
+			this.publisher = publisher;
+			this.adminEmail = adminEmail;
+		}
+		
+
 	}
 
-	private static class BookDeleteRequest {
+	public static class BookDeleteRequest {
 		private Integer bookId;
 		private String adminEmail;
 
@@ -64,6 +73,14 @@ public class BookController {
 		public String getAdminEmail() {
 			return adminEmail;
 		}
+
+		public BookDeleteRequest(Integer bookId, String adminEmail) {
+			super();
+			this.bookId = bookId;
+			this.adminEmail = adminEmail;
+		}
+		
+		
 
 	}
 
@@ -89,7 +106,7 @@ public class BookController {
 		if (newBook == null) {
 			return ResponseEntity.status(400).build();
 		}
-		return ResponseEntity.of(Optional.of(newBook));
+		return ResponseEntity.ok(newBook);
 	}
 
 	@DeleteMapping("/books/{bookId}")

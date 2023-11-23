@@ -18,8 +18,13 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 @Service
 public class AuthorizationServiceImpl implements AuthorizationService {
-	String secret = "ashodhalksdjlasjdlajsdlkajsdlkajsdlkasjdlkajsldjasldkj";
-	Key hmacKey = new SecretKeySpec(Base64.getDecoder().decode(secret), SignatureAlgorithm.HS256.getJcaName());
+	private static final String HMAC_SECRET = "ashodhalksdjlasjdlajsdlkajsdlkajsdlkasjdlkajsldjasldkj";
+
+    private final Key hmacKey;
+
+    public AuthorizationServiceImpl() {
+        this.hmacKey = new SecretKeySpec(HMAC_SECRET.getBytes(), SignatureAlgorithm.HS256.getJcaName());
+    }
 
 	@Override
 	public String generateToken(Integer userId) {
