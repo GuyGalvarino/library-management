@@ -22,7 +22,6 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User getUserByEmail(String email) {
 		User user = userDao.findByEmail(email).orElse(null);
-		System.out.println(user);
 		return user;
 	}
 
@@ -44,5 +43,11 @@ public class UserServiceImpl implements UserService {
 		}
 		return deletedUser;
 	}
+	
+	public UserServiceImpl(UserDao userDao) {
+		this.userDao = userDao;
+	}
+	
+	public UserServiceImpl() {}
 
 }

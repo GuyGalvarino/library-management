@@ -63,4 +63,11 @@ public class IssueServiceImpl implements IssueService {
 		userDao.save(fetchedUser);
 		return result == -1 ? null : bookService.getBook(bookId);
 	}
+	
+	public IssueServiceImpl() {}
+	public IssueServiceImpl(BookService bookService, UserService userService, UserDao userDao) {
+		this.bookService = bookService;
+		this.userService = userService;
+		this.userDao = userDao;
+	}
 }

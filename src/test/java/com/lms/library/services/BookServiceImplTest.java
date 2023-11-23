@@ -3,6 +3,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,7 @@ public class BookServiceImplTest {
 		//Arrange
 		BookDao bookDao = mock(BookDao.class);
 		UserDao userDao = mock(UserDao.class);
-		BookServiceImpl bookServiceImpl = new BookServiceImpl();
+		BookServiceImpl bookServiceImpl = new BookServiceImpl(bookDao,userDao);
 		String name = "Sample";
 		String author = "Swapnil";
 		String publisher = "Saample_Pubisher";
@@ -43,11 +44,12 @@ public class BookServiceImplTest {
 		//Arrange
 		BookDao bookDao = mock(BookDao.class);
 		UserDao userDao = mock(UserDao.class);
-		BookServiceImpl bookServiceImpl = new BookServiceImpl();
-	    Integer bookId =1;
+		BookServiceImpl bookServiceImpl = new BookServiceImpl(bookDao,userDao);
 	    Book expectedBook = new Book("Sample Book", "Swapnil", "Sample_Publisher");
+	    Integer bookId = 1;
+	    User user = new User("Sagnik", "sagnik@gmail.com", "password");
 	    when(bookDao.findById(eq(bookId))).thenReturn(java.util.Optional.of(expectedBook));
-	    when(userDao.findAll()).thenReturn(new ArrayList<>());
+	    when(userDao.findAll()).thenReturn(List.of(user));
 		
 		//Act
 		Book result = bookServiceImpl.removeBook(bookId);
@@ -57,8 +59,7 @@ public class BookServiceImplTest {
 		assertEquals(expectedBook, result);
 		
 		verify(bookDao, times(1)).findById(eq(bookId));
-		verify(bookDao, times(1)).findAll();
-		verify(bookDao, times(1)).saveAll(anyList());
+		verify(userDao, times(1)).saveAll(anyList());
 		verify(bookDao, times(1)).deleteById(eq(bookId));
 
 	}
@@ -69,7 +70,7 @@ public class BookServiceImplTest {
 		//Arrange
 		BookDao bookDao = mock(BookDao.class);
 		UserDao userDao = mock(UserDao.class);
-		BookServiceImpl bookServiceImpl = new BookServiceImpl();
+		BookServiceImpl bookServiceImpl = new BookServiceImpl(bookDao,userDao);
 	    Integer bookId =1;
 	    when(bookDao.findById(eq(bookId))).thenReturn(Optional.empty());
 		
@@ -80,18 +81,19 @@ public class BookServiceImplTest {
 		assertNull(result);
 		
 		verify(bookDao, times(1)).findById(eq(bookId));
-		verify(bookDao, times(1)).findAll();
-		verify(bookDao, times(1)).saveAll(anyList());
-		verify(bookDao, times(1)).deleteById(eq(bookId));
+		verify(bookDao, times(0)).findAll();
+		verify(bookDao, times(0)).saveAll(anyList());
+		verify(bookDao, times(0)).deleteById(eq(bookId));
 	}
 	
 	@Test
 	public void testGetBookById_BookExists_ReturnsBook() {
 		//Arrange
 		BookDao bookDao = mock(BookDao.class);
-		BookServiceImpl bookServiceImpl = new BookServiceImpl();
-		Integer bookId = 3;
+		UserDao userDao = mock(UserDao.class);
+		BookServiceImpl bookServiceImpl = new BookServiceImpl(bookDao,userDao);
 		Book expectedBook = new Book("Sample Book", "Swapnil", "Sample_Publisher");
+		Integer bookId = expectedBook.getBookId();
 		when(bookDao.findById(eq(bookId))).thenReturn(java.util.Optional.of(expectedBook));
 		
 		//Act
@@ -108,7 +110,8 @@ public class BookServiceImplTest {
 	public void testGetBookById_BookDoesNotExists_ReturnsNull() {
 		//Arrange
 		BookDao bookDao = mock(BookDao.class);
-		BookServiceImpl bookServiceImpl = new BookServiceImpl();
+		UserDao userDao = mock(UserDao.class);
+		BookServiceImpl bookServiceImpl = new BookServiceImpl(bookDao,userDao);
 		Integer bookId = 3;
 		when(bookDao.findById(eq(bookId))).thenReturn(Optional.empty());
 		

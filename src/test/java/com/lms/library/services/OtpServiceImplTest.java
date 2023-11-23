@@ -15,7 +15,7 @@ public class OtpServiceImplTest {
 	public void testSendOtp() {
 		MailService mailService = mock(MailService.class);
 		OtpDao otpDao = mock(OtpDao.class);
-		OtpServiceImpl otpService = new OtpServiceImpl();
+		OtpServiceImpl otpService = new OtpServiceImpl(otpDao, mailService);
 		
 		String email="swapnil@gmail.com";
 		String name = "Swapnil";
@@ -32,7 +32,8 @@ public class OtpServiceImplTest {
 	public void testSendOtpAdmin() {
 		MailService mailService = mock(MailService.class);
 		AdminDao adminDao = mock(AdminDao.class);
-		OtpServiceImpl otpService = new OtpServiceImpl();
+		OtpDao otpDao = mock(OtpDao.class);
+		OtpServiceImpl otpService = new OtpServiceImpl(otpDao,adminDao, mailService);
 		
 		Admin admin = new Admin();
 		admin.setEmail("example@gmail.com");
@@ -49,7 +50,7 @@ public class OtpServiceImplTest {
 	public void testVerifyOtp_CorrectOtp_ReturnOtp() {
 		MailService mailService = mock(MailService.class);
 		OtpDao otpDao = mock(OtpDao.class);
-		OtpServiceImpl otpService = new OtpServiceImpl();
+		OtpServiceImpl otpService = new OtpServiceImpl(otpDao, mailService);
 		
 		String email="swapnil@gmail.com";
 		String otp = "123456";
@@ -71,7 +72,7 @@ public class OtpServiceImplTest {
 	public void testVerifyOtp_IncorrectOtp_ReturnsNUll() {
 		MailService mailService = mock(MailService.class);
 		OtpDao otpDao = mock(OtpDao.class);
-		OtpServiceImpl otpService = new OtpServiceImpl();
+		OtpServiceImpl otpService = new OtpServiceImpl(otpDao, mailService);
 		
 		String email="swapnil@gmail.com";
 		String otp = "123456";
@@ -85,14 +86,14 @@ public class OtpServiceImplTest {
 		
 		//verify
 		verify(otpDao, times(1)).findById(eq(email));
-		verify(otpDao,times(1)).deleteById(eq(email));
+		verify(otpDao,times(0)).deleteById(eq(email));
 	}
 	
 	@Test
 	public void testVerifyOtp_OtpNotFound_ReturnsNUll() {
 		MailService mailService = mock(MailService.class);
 		OtpDao otpDao = mock(OtpDao.class);
-		OtpServiceImpl otpService = new OtpServiceImpl();
+		OtpServiceImpl otpService = new OtpServiceImpl(otpDao, mailService);
 		
 		String email="swapnil@gmail.com";
 		String otp = "123456";
@@ -105,14 +106,15 @@ public class OtpServiceImplTest {
 		
 		//verify
 		verify(otpDao, times(1)).findById(eq(email));
-		verify(otpDao,times(1)).deleteById(eq(email));
+		verify(otpDao,times(0)).deleteById(eq(email));
 	}
 	
 	@Test
 	public void testVerifyOtpAdmin_CorrectOtp_ReturnsAdmin() {
 		MailService mailService = mock(MailService.class);
 		AdminDao adminDao = mock(AdminDao.class);
-		OtpServiceImpl otpService = new OtpServiceImpl();
+		OtpDao otpDao = mock(OtpDao.class);
+		OtpServiceImpl otpService = new OtpServiceImpl(otpDao,adminDao, mailService);
 		
 		String email="swapnil@gmail.com";
 		String otp = "123456";
@@ -137,7 +139,8 @@ public class OtpServiceImplTest {
 	public void testVerifyOtpAdmin_IncorrectOtp_ReturnsNull() {
 		MailService mailService = mock(MailService.class);
 		AdminDao adminDao = mock(AdminDao.class);
-		OtpServiceImpl otpService = new OtpServiceImpl();
+		OtpDao otpDao = mock(OtpDao.class);
+		OtpServiceImpl otpService = new OtpServiceImpl(otpDao,adminDao, mailService);
 		
 		String email="swapnil@gmail.com";
 		String otp = "123456";
@@ -154,14 +157,15 @@ public class OtpServiceImplTest {
 		
 		//verify
 		verify(adminDao, times(1)).findById(eq(email));
-		verify(adminDao,times(1)).save(any(Admin.class));
+		verify(adminDao,times(0)).save(any(Admin.class));
 	}
 	
 	@Test
 	public void testVerifyOtpAdmin_AdminNotFound_ReturnsNull() {
 		MailService mailService = mock(MailService.class);
 		AdminDao adminDao = mock(AdminDao.class);
-		OtpServiceImpl otpService = new OtpServiceImpl();
+		OtpDao otpDao = mock(OtpDao.class);
+		OtpServiceImpl otpService = new OtpServiceImpl(otpDao,adminDao, mailService);
 		
 		String email="swapnil@gmail.com";
 		String otp = "123456";
@@ -175,6 +179,6 @@ public class OtpServiceImplTest {
 		
 		//verify
 		verify(adminDao, times(1)).findById(eq(email));
-		verify(adminDao,times(1)).save(any(Admin.class));
+		verify(adminDao,times(0)).save(any(Admin.class));
 	}
 }

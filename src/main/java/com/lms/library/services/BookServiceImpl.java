@@ -53,4 +53,10 @@ public class BookServiceImpl implements BookService {
 		bookDao.deleteById(bookId);
 		return book;
 	}
+	
+	public BookServiceImpl() {}
+	public BookServiceImpl(BookDao bookDao, UserDao userDao) {
+		this.bookDao=bookDao;
+		this.userDao=userDao;
+	}
 }
