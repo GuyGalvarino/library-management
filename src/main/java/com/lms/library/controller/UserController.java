@@ -167,7 +167,7 @@ public class UserController {
 		String password = request.getPassword();
 
 		if (userService.getUserByEmail(email) != null) {
-			return ResponseEntity.status(400).build();
+			return ResponseEntity.status(403).build();
 		}
 
 		otpService.sendOtp(email, name, password);
