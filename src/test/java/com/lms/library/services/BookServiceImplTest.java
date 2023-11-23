@@ -47,7 +47,9 @@ public class BookServiceImplTest {
 		BookServiceImpl bookServiceImpl = new BookServiceImpl(bookDao,userDao);
 	    Book expectedBook = new Book("Sample Book", "Swapnil", "Sample_Publisher");
 	    Integer bookId = 1;
+	    expectedBook.setBookId(bookId);
 	    User user = new User("Sagnik", "sagnik@gmail.com", "password");
+	   
 	    when(bookDao.findById(eq(bookId))).thenReturn(java.util.Optional.of(expectedBook));
 	    when(userDao.findAll()).thenReturn(List.of(user));
 		

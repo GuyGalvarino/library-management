@@ -75,6 +75,7 @@ public class UserServiceImplTest {
 		UserServiceImpl userService = new UserServiceImpl(userDao);
 		Integer userId = 3;
 		User expectedUser = new User("Swapnil", "Swapnil@gmail.com", "hashedPassword");
+		expectedUser.setUserId(userId);
 		when(userDao.findById(eq(userId))).thenReturn(java.util.Optional.of(expectedUser));
 
 		// Act
@@ -111,6 +112,7 @@ public class UserServiceImplTest {
 		UserServiceImpl userService = new UserServiceImpl(userDao);
 		Integer userId = 3;
 		User expectedUser = new User("Swapnil", "Swapnil@gmail.com", "hashedPassword");
+		expectedUser.setUserId(userId);
 		when(userDao.findById(eq(userId))).thenReturn(java.util.Optional.of(expectedUser));
 
 		// Act

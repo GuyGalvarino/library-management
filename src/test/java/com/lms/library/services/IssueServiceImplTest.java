@@ -1,104 +1,86 @@
 package com.lms.library.services;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
-
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import com.lms.library.dao.BookDao;
 import com.lms.library.dao.UserDao;
 import com.lms.library.entities.Book;
 import com.lms.library.entities.User;
 
-@ExtendWith(MockitoExtension.class)
-public class IssueServiceImplTest {
-	
+@SpringBootTest
+class IssueServiceImplTest {
+
+    @Mock
+    private BookService bookService;
+
+    @Mock
+    private UserService userService;
+
     @Mock
     private UserDao userDao;
 
-    @Mock
-    private BookDao bookDao;
-    
-    private UserService userService;
-    
-    private BookService bookService;
+    @InjectMocks
+    private IssueServiceImpl issueService;
 
-    private IssueService issueService;
+    @Test
+    void testGetIssues() {
+        // Mocking data
+        Integer userId = 1;
+        User mockUser = new User();
+        mockUser.setUserId(userId);
+        mockUser.issueBook(1);
+        mockUser.issueBook(2);
 
-    private User sampleUser;
+        when(userDao.findById(userId)).thenReturn(java.util.Optional.ofNullable(mockUser));
+        when(bookService.getBook(1)).thenReturn(new Book("Book1", "Author1","Publisher1"));
+        when(bookService.getBook(102)).thenReturn(new Book("Book1", "Author1","Publisher1"));
 
-    @BeforeEach
-    void setUp() {
-        // Initialize sample data for testing
-    	bookService = new BookServiceImpl(bookDao, userDao);
-    	issueService = new IssueServiceImpl(bookService, userService, userDao);	
-        sampleUser = new User();
-        sampleUser.setUserId(1);
-        sampleUser.issueBook(1);
-        sampleUser.issueBook(2);
+        // Test
+        assertEquals(2, issueService.getIssues(userId).size());
     }
-    
-	    @Test
-	    void testGetIssues() {
-	        // Mock BookService's getBook method
-	    	when(bookDao.findById(1)).thenReturn(Optional.of(new Book("Book1","Rio","RkPublication")));
-	    	when(bookDao.findById(2)).thenReturn(Optional.of(new Book("Book2","Mio","RkPublication")));
-	    	when(userDao.findById(1)).thenReturn(Optional.of(sampleUser));
 
-	        // Call the getIssues method
-	        List<Book> issuedBooks = issueService.getIssues(1);
+    @Test
+    void testAddIssue() {
+        // Mocking data
+        Integer bookId = 101;
+        Integer userId = 1;
 
-	        // Verify that the list of issued books is returned correctly
-	        assertEquals(2, issuedBooks.size());
-	        assertEquals("Book1", issuedBooks.get(0).getName());
-	        assertEquals("Book2", issuedBooks.get(1).getName());
-	    }
+        Book mockBook = new Book("Book1", "Author1","Publisher1");
+        User mockUser = new User();
+        mockUser.setUserId(userId);
+        mockBook.setBookId(bookId);
+        
 
-	    @Test
-	    void testAddIssue() {
-	        // Mock BookService's getBook method
-	        when(bookDao.getBook(1)).thenReturn(sampleBook);
-	        when(bookDao.getBook(2)).thenReturn(null); // Simulate a book not found case
+        when(bookService.getBook(bookId)).thenReturn(mockBook);
+        when(userService.getUser(userId)).thenReturn(mockUser);
 
-	        // Mock UserService's getUser method
-	        when(userService.getUser(1)).thenReturn(sampleUser);
+        // Test
+        assertNotNull(issueService.addIssue(bookId, userId));
+        assertTrue(mockUser.getIssuedBooks().contains(bookId));
+    }
 
-	        // Execute the addIssue method
-	        Book addedBook = issueService.addIssue(1, 1);
+    @Test
+    void testRemoveIssue() {
+        // Mocking data
+        Integer bookId = 101;
+        Integer userId = 1;
 
-	        // Verify that the book is added successfully
-	        assertEquals(sampleBook, addedBook);
+        Book mockBook = new Book("Book1", "Author1","Publisher1");
+        User mockUser = new User();
+        mockUser.setUserId(userId);
+        mockBook.setBookId(bookId);
+        mockUser.issueBook(bookId);
 
-	        // Verify that the userDao.save method is called
-	        verify(userDao, times(1)).save(sampleUser);
-	    }
-//
-//	   // @Test
-//	    void testRemoveIssue() {
-//	        // Mock BookService's getBook method
-//	        when(bookService.getBook(1)).thenReturn(sampleBook);
-//	        when(bookService.getBook(2)).thenReturn(null); // Simulate a book not found case
-//
-//	        // Mock UserService's getUser method
-//	        when(userService.getUser(1)).thenReturn(sampleUser);
-//
-//	        // Execute the removeIssue method
-//	        Book removedBook = issueService.removeIssue(1, 1);
-//
-//	        // Verify that the book is removed successfully
-//	        assertEquals(sampleBook, removedBook);
-//
-//	        // Verify that the userDao.save method is called
-//	        verify(userDao, times(1)).save(sampleUser);
-//	    }
+        when(userService.getUser(userId)).thenReturn(mockUser);
+        when(bookService.getBook(bookId)).thenReturn(mockBook);
 
+        // Test
+        assertNotNull(issueService.removeIssue(bookId, userId));
+        assertFalse(mockUser.getIssuedBooks().contains(bookId));
+    }
 }
