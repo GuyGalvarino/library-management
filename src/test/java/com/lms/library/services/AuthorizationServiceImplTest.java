@@ -7,6 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.lms.library.entities.User;
+
 import io.jsonwebtoken.SignatureAlgorithm;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -30,6 +32,8 @@ public class AuthorizationServiceImplTest {
     @Test
     void testGenerateToken() {
         Integer userId = 1;
+        User mockUser = new User();
+        mockUser.setUserId(userId);
         String token = authorizationService.generateToken(userId);
         assertTrue(authorizationService.verifyToken(userId, token));
     }
@@ -44,6 +48,8 @@ public class AuthorizationServiceImplTest {
     @Test
     public void testVerifyTokenValid() {
         Integer userId = 456;
+        User mockUser = new User();
+        mockUser.setUserId(userId);
         String token = authorizationService.generateToken(userId);
         assertTrue(authorizationService.verifyToken(userId, token));
     }
@@ -51,6 +57,8 @@ public class AuthorizationServiceImplTest {
     @Test
     public void testVerifyTokenInvalidUserId() {
         Integer userId = 789;
+        User mockUser = new User();
+        mockUser.setUserId(userId);
         String token = authorizationService.generateToken(123);
         assertFalse(authorizationService.verifyToken(userId, token));
     }
@@ -58,6 +66,8 @@ public class AuthorizationServiceImplTest {
     @Test
     public void testVerifyTokenInvalidToken() {
         Integer userId = 123;
+        User mockUser = new User();
+        mockUser.setUserId(userId);
         String token = "invalid_token";
         assertFalse(authorizationService.verifyToken(userId, token));
     }
