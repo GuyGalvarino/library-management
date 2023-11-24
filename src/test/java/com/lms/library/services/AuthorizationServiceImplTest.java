@@ -1,5 +1,6 @@
 package com.lms.library.services;
 
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,23 +19,67 @@ import java.util.Base64;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthorizationServiceImplTest {
-	private static final String secret = "ashodhalksdjlasjdlajsdlkajsdlkajsdlkasjdlkajsldjasldkj";
-	Key hmacKey = new SecretKeySpec(Base64.getDecoder().decode(secret), SignatureAlgorithm.HS256.getJcaName());
+	@Mock
+    private AuthorizationService authorizationService;
 
-
-    @InjectMocks
-    private AuthorizationServiceImpl authService;
+    @Before
+    public void setUp() {
+        authorizationService = new AuthorizationServiceImpl(); 
+    }
+    
     @Test
     void testGenerateToken() {
-    	AuthorizationServiceImpl authServiceImpl = new AuthorizationServiceImpl();
         Integer userId = 1;
-        String generatedToken = authServiceImpl.generateToken(userId);
-
-        assertNotNull(generatedToken);
-        assertTrue(generatedToken.length() > 0);
-
-        // You may want to verify the behavior of the Jwts.builder() and signWith methods using Mockito
-        verify(hmacKey).getAlgorithm();
+        String token = authorizationService.generateToken(userId);
+        assertTrue(authorizationService.verifyToken(userId, token));
     }
 
+    @Test
+    public void testGenerateAdminToken() {
+        String email = "admin@example.com";
+        String token = authorizationService.generateAdminToken(email);
+        assertTrue(authorizationService.verifyAdminToken(email, token));
+    }
+    
+    @Test
+    public void testVerifyTokenValid() {
+        Integer userId = 456;
+        String token = authorizationService.generateToken(userId);
+        assertTrue(authorizationService.verifyToken(userId, token));
+    }
+    
+    @Test
+    public void testVerifyTokenInvalidUserId() {
+        Integer userId = 789;
+        String token = authorizationService.generateToken(123);
+        assertFalse(authorizationService.verifyToken(userId, token));
+    }
+
+    @Test
+    public void testVerifyTokenInvalidToken() {
+        Integer userId = 123;
+        String token = "invalid_token";
+        assertFalse(authorizationService.verifyToken(userId, token));
+    }
+    
+    @Test
+    public void testVerifyAdminTokenValid() {
+        String email = "admin@example.com";
+        String token = authorizationService.generateAdminToken(email);
+        assertTrue(authorizationService.verifyAdminToken(email, token));
+    }
+
+    @Test
+    public void testVerifyAdminTokenInvalidEmail() {
+        String email = "admin@example.com";
+        String token = authorizationService.generateAdminToken("another_admin@example.com");
+        assertFalse(authorizationService.verifyAdminToken(email, token));
+    }
+
+    @Test
+    public void testVerifyAdminTokenInvalidToken() {
+        String email = "admin@example.com";
+        String token = "invalid_token";
+        assertFalse(authorizationService.verifyAdminToken(email, token));
+    }
 }

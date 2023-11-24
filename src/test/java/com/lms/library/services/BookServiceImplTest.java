@@ -2,7 +2,6 @@ package com.lms.library.services;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +20,6 @@ import com.lms.library.entities.User;
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 public class BookServiceImplTest {
-	
 	@Test
 	public void testAddBook_SuccessfullSave_ReturnBook() {
 		//Arrange
@@ -42,6 +40,25 @@ public class BookServiceImplTest {
 		assertEquals(expectedBook, result);
 		
 		verify(bookDao, times(1)).save(any(Book.class));
+	}
+	
+	@Test
+	public void testAddBook_ExceptionThrown_ReturnsNull() {
+		BookDao bookDao = mock(BookDao.class);
+		UserDao userDao = mock(UserDao.class);
+		BookServiceImpl bookServiceImpl = new BookServiceImpl(bookDao,userDao);
+		String name = "Sample";
+		String author = "Swapnil";
+		String publisher = "Saample_Pubisher";
+
+	    when(bookDao.save(any(Book.class))).thenThrow(new RuntimeException("Database error"));
+
+	    // Act
+	    Book result = bookServiceImpl.addBook(name, author, publisher);
+
+	    // Assert
+	    assertNull(result);
+	    verify(bookDao, times(1)).save(any(Book.class));
 	}
 	
 	@Test
@@ -126,4 +143,6 @@ public class BookServiceImplTest {
 		assertNull(result);
 		verify(bookDao,times(1)).findById(eq(bookId));
 	}
+	
+	
 }
