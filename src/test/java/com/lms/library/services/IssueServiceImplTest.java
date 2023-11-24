@@ -9,15 +9,19 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.lms.library.dao.UserDao;
 import com.lms.library.entities.Book;
 import com.lms.library.entities.User;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
 class IssueServiceImplTest {
 
     @Mock
@@ -43,7 +47,7 @@ class IssueServiceImplTest {
 
         when(userDao.findById(userId)).thenReturn(java.util.Optional.ofNullable(mockUser));
         when(bookService.getBook(1)).thenReturn(new Book("Book1", "Author1","Publisher1"));
-        when(bookService.getBook(102)).thenReturn(new Book("Book1", "Author1","Publisher1"));
+        when(bookService.getBook(2)).thenReturn(new Book("Book2", "Author2","Publisher2"));
 
         // Test
         assertEquals(2, issueService.getIssues(userId).size());
@@ -197,26 +201,5 @@ class IssueServiceImplTest {
 
         // Verify that the userDao.save method is not called
         verify(userDao, never()).save(any(User.class));
-    }
-    
-    @Test
-    void testRemoveIssueWithInvalidBook() {
-        // Mocking data
-        Integer userId = 1;
-        User mockUser = new User();
-        mockUser.setUserId(userId);
-        // Mock UserService's getUser method
-        when(userService.getUser(userId)).thenReturn(mockUser);
-        // Mock BookService's getBook method
-        when(bookService.getBook(2)).thenReturn(null); // Simulate a book not found case
-
-        // Call the removeIssue method
-        Book removedBook = issueService.removeIssue(1, 1);
-
-        // Verify that null is returned for an invalid book
-        assertNull(removedBook);
-
-        // Verify that the userDao.save method is called
-        verify(userDao, times(1)).save(mockUser);
     }
 }

@@ -10,12 +10,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.lms.library.dao.AdminDao;
 import com.lms.library.entities.Admin;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
 public class AdminServiceImplTest {
-	
 	@Test
 	public void testGetAdminByEmail_AdminExists_ReturnsAdmin() {
 		// Arrange

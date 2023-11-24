@@ -3,14 +3,18 @@ package com.lms.library.services;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.lms.library.dao.AdminDao;
 import com.lms.library.dao.OtpDao;
 import com.lms.library.entities.Admin;
 import com.lms.library.entities.Otp;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
 public class OtpServiceImplTest {
-	
 	@Test
 	public void testSendOtp() {
 		MailService mailService = mock(MailService.class);

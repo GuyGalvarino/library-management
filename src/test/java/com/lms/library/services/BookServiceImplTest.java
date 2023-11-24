@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,6 +18,8 @@ import com.lms.library.dao.UserDao;
 import com.lms.library.entities.Book;
 import com.lms.library.entities.User;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
 public class BookServiceImplTest {
 	
 	@Test
@@ -52,7 +57,6 @@ public class BookServiceImplTest {
 	   
 	    when(bookDao.findById(eq(bookId))).thenReturn(java.util.Optional.of(expectedBook));
 	    when(userDao.findAll()).thenReturn(List.of(user));
-		
 		//Act
 		Book result = bookServiceImpl.removeBook(bookId);
 		
@@ -63,7 +67,6 @@ public class BookServiceImplTest {
 		verify(bookDao, times(1)).findById(eq(bookId));
 		verify(userDao, times(1)).saveAll(anyList());
 		verify(bookDao, times(1)).deleteById(eq(bookId));
-
 	}
 	
 	
@@ -116,17 +119,11 @@ public class BookServiceImplTest {
 		BookServiceImpl bookServiceImpl = new BookServiceImpl(bookDao,userDao);
 		Integer bookId = 3;
 		when(bookDao.findById(eq(bookId))).thenReturn(Optional.empty());
-		
 		//Act
 		Book result = bookServiceImpl.getBook(bookId);
 		
 		//Assert
 		assertNull(result);
-		
 		verify(bookDao,times(1)).findById(eq(bookId));
-	
 	}
-	
-	
-
 }
