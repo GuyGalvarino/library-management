@@ -22,20 +22,17 @@ import com.lms.library.entities.User;
 public class BookServiceImplTest {
 	@Test
 	public void testAddBook_SuccessfullSave_ReturnBook() {
-		//Arrange
 		BookDao bookDao = mock(BookDao.class);
 		UserDao userDao = mock(UserDao.class);
 		BookServiceImpl bookServiceImpl = new BookServiceImpl(bookDao,userDao);
 		String name = "Sample";
 		String author = "Swapnil";
-		String publisher = "Saample_Pubisher";
+		String publisher = "Sample_Pubisher";
 		Book expectedBook =  new Book(name,author,publisher);
 		when(bookDao.save(any(Book.class))).thenReturn(expectedBook);
-		
-		//Act
+
 		Book result = bookServiceImpl.addBook(name, author, publisher);
-		
-		//Assert
+
 		assertNotNull(result);
 		assertEquals(expectedBook, result);
 		
@@ -53,17 +50,14 @@ public class BookServiceImplTest {
 
 	    when(bookDao.save(any(Book.class))).thenThrow(new RuntimeException("Database error"));
 
-	    // Act
 	    Book result = bookServiceImpl.addBook(name, author, publisher);
 
-	    // Assert
 	    assertNull(result);
 	    verify(bookDao, times(1)).save(any(Book.class));
 	}
 	
 	@Test
 	public void testRemoveBook_BookExists_RemoveBookAndReturnBook() {
-		//Arrange
 		BookDao bookDao = mock(BookDao.class);
 		UserDao userDao = mock(UserDao.class);
 		BookServiceImpl bookServiceImpl = new BookServiceImpl(bookDao,userDao);
@@ -71,13 +65,14 @@ public class BookServiceImplTest {
 	    Integer bookId = 1;
 	    expectedBook.setBookId(bookId);
 	    User user = new User("Sagnik", "sagnik@gmail.com", "password");
+	    Integer userId=1;
+	    user.setUserId(userId);
 	   
 	    when(bookDao.findById(eq(bookId))).thenReturn(java.util.Optional.of(expectedBook));
 	    when(userDao.findAll()).thenReturn(List.of(user));
-		//Act
+
 		Book result = bookServiceImpl.removeBook(bookId);
-		
-		//Assert
+
 		assertNotNull(result);
 		assertEquals(expectedBook, result);
 		
@@ -86,20 +81,16 @@ public class BookServiceImplTest {
 		verify(bookDao, times(1)).deleteById(eq(bookId));
 	}
 	
-	
 	@Test
 	public void testRemoveBook_BookDoesNotExists_ReturnsNull() {
-		//Arrange
 		BookDao bookDao = mock(BookDao.class);
 		UserDao userDao = mock(UserDao.class);
 		BookServiceImpl bookServiceImpl = new BookServiceImpl(bookDao,userDao);
 	    Integer bookId =1;
 	    when(bookDao.findById(eq(bookId))).thenReturn(Optional.empty());
-		
-		//Act
+
 		Book result = bookServiceImpl.removeBook(bookId);
-		
-		//Assert
+
 		assertNull(result);
 		
 		verify(bookDao, times(1)).findById(eq(bookId));
@@ -110,7 +101,6 @@ public class BookServiceImplTest {
 	
 	@Test
 	public void testGetBookById_BookExists_ReturnsBook() {
-		//Arrange
 		BookDao bookDao = mock(BookDao.class);
 		UserDao userDao = mock(UserDao.class);
 		BookServiceImpl bookServiceImpl = new BookServiceImpl(bookDao,userDao);
@@ -118,10 +108,8 @@ public class BookServiceImplTest {
 		Integer bookId = expectedBook.getBookId();
 		when(bookDao.findById(eq(bookId))).thenReturn(java.util.Optional.of(expectedBook));
 		
-		//Act
 	    Book result = bookServiceImpl.getBook(bookId);
-		
-		//Assert
+
 		assertNotNull(result);
 		assertEquals(expectedBook, result);
 		
@@ -130,19 +118,15 @@ public class BookServiceImplTest {
 	
 	@Test
 	public void testGetBookById_BookDoesNotExists_ReturnsNull() {
-		//Arrange
 		BookDao bookDao = mock(BookDao.class);
 		UserDao userDao = mock(UserDao.class);
 		BookServiceImpl bookServiceImpl = new BookServiceImpl(bookDao,userDao);
 		Integer bookId = 3;
 		when(bookDao.findById(eq(bookId))).thenReturn(Optional.empty());
-		//Act
+
 		Book result = bookServiceImpl.getBook(bookId);
-		
-		//Assert
+
 		assertNull(result);
 		verify(bookDao,times(1)).findById(eq(bookId));
 	}
-	
-	
 }
