@@ -31,9 +31,11 @@ public class UserServiceImplTest {
 		String email = "Swapnil@gmail.com";
 		String passwordHash = "hashedPassword";
 		User expectedUser = new User(name, email, passwordHash);
+		expectedUser.setUserId(1);
 		when(userDao.save(any(User.class))).thenReturn(expectedUser);
 		// Act
 		User result = userService.createUser(name, email, passwordHash);
+		System.out.println(result);
 		// Assert
 		assertNotNull(result);
 		assertEquals(expectedUser, result);
