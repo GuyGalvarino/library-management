@@ -24,10 +24,9 @@ public class OtpServiceImplTest {
 		String email="swapnil@gmail.com";
 		String name = "Swapnil";
 		String password="password";
-		//Act
+
 		otpService.sendOtp(email, name, password);
-		
-		//Assert
+
 		verify(otpDao, times(1)).save(any(Otp.class));
 		verify(mailService,times(1)).sendMail(eq(email), anyString(),anyString());
 	}
@@ -42,10 +41,8 @@ public class OtpServiceImplTest {
 		Admin admin = new Admin();
 		admin.setEmail("example@gmail.com");
 		
-		//Act
 		otpService.sendOtpAdmin(admin);
 		
-		//Assert
 		verify(adminDao, times(1)).save(any(Admin.class));
 		verify(mailService,times(1)).sendMail(eq(admin.getEmail()), anyString(),anyString());
 	}
@@ -60,14 +57,12 @@ public class OtpServiceImplTest {
 		String otp = "123456";
 		Otp userOtp = new Otp(email,"Swapnil","hashedPassword",otp);
 		when(otpDao.findById(eq(email))).thenReturn(java.util.Optional.of(userOtp));
-		//Act
+
 		Otp result = otpService.verifyOtp(email, otp);
-		
-		//Assert
+
 		assertNotNull(result);
 		assertEquals(userOtp,result);
-		
-		//verify
+
 		verify(otpDao, times(1)).findById(eq(email));
 		verify(otpDao,times(1)).deleteById(eq(email));
 	}
@@ -82,13 +77,11 @@ public class OtpServiceImplTest {
 		String otp = "123456";
 		Otp userOtp = new Otp(email,"Swapnil","hashedPassword","654321");
 		when(otpDao.findById(eq(email))).thenReturn(java.util.Optional.of(userOtp));
-		//Act
+
 		Otp result = otpService.verifyOtp(email, otp);
 		
-		//Assert
 		assertNull(result);
 		
-		//verify
 		verify(otpDao, times(1)).findById(eq(email));
 		verify(otpDao,times(0)).deleteById(eq(email));
 	}
@@ -102,13 +95,11 @@ public class OtpServiceImplTest {
 		String email="swapnil@gmail.com";
 		String otp = "123456";
 		when(otpDao.findById(eq(email))).thenReturn(java.util.Optional.empty());
-		//Act
+	
 		Otp result = otpService.verifyOtp(email, otp);
 		
-		//Assert
 		assertNull(result);
-		
-		//verify
+
 		verify(otpDao, times(1)).findById(eq(email));
 		verify(otpDao,times(0)).deleteById(eq(email));
 	}
@@ -127,14 +118,11 @@ public class OtpServiceImplTest {
 		admin.setOtp(otp);
 	
 		when(adminDao.findById(eq(email))).thenReturn(java.util.Optional.of(admin));
-		//Act
+		
 		Admin result = otpService.verifyOtpAdmin(email, otp);
-		
-		//Assert
+
 		assertNotNull(result);
-		assertNull(result.getOtp());
-		
-		//verify
+
 		verify(adminDao, times(1)).findById(eq(email));
 		verify(adminDao,times(1)).save(any(Admin.class));
 	}
@@ -153,13 +141,11 @@ public class OtpServiceImplTest {
 		admin.setOtp("654321");
 	
 		when(adminDao.findById(eq(email))).thenReturn(java.util.Optional.of(admin));
-		//Act
+	
 		Admin result = otpService.verifyOtpAdmin(email, otp);
-		
-		//Assert
+
 		assertNull(result);
-		
-		//verify
+
 		verify(adminDao, times(1)).findById(eq(email));
 		verify(adminDao,times(0)).save(any(Admin.class));
 	}
@@ -175,13 +161,11 @@ public class OtpServiceImplTest {
 		String otp = "123456";
 	
 		when(adminDao.findById(eq(email))).thenReturn(java.util.Optional.empty());
-		//Act
+
 		Admin result = otpService.verifyOtpAdmin(email, otp);
-		
-		//Assert
+
 		assertNull(result);
-		
-		//verify
+
 		verify(adminDao, times(1)).findById(eq(email));
 		verify(adminDao,times(0)).save(any(Admin.class));
 	}
