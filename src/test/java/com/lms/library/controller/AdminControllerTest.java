@@ -13,12 +13,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.lms.library.controller.AdminController;
 import com.lms.library.services.AdminService;
 import com.lms.library.services.AuthorizationService;
 import com.lms.library.services.OtpService;
-
-import java.util.Optional;
 
 @WebMvcTest(AdminController.class)
 public class AdminControllerTest {

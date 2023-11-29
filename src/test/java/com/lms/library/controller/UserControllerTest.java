@@ -15,7 +15,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.lms.library.controller.UserController;
 import com.lms.library.entities.Otp;
 import com.lms.library.entities.User;
 import com.lms.library.services.AuthorizationService;
