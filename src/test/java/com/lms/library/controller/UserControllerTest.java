@@ -61,7 +61,7 @@ public class UserControllerTest {
         // a password hash for "password123" is "$2a$12$iuRlmXWwOAhLEndopzhskODvnQT3MWcP66l0H0F7Lqbsw5teBSslq"
         User user = new User("John Doe", "john@example.com", "$2a$12$iuRlmXWwOAhLEndopzhskODvnQT3MWcP66l0H0F7Lqbsw5teBSslq");
         user.setUserId(1);
-        when(userService.getUserByEmail(any())).thenReturn(user);
+        when(userService.getUserByEmail("john@example.com")).thenReturn(user);
         when(authorizationService.generateToken(any())).thenReturn("testToken");
 
         mockMvc.perform(post("/users/login")
