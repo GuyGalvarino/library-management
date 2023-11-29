@@ -1,78 +1,98 @@
 package com.lms.library.services;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.security.Key;
-import java.util.Date;
-
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.lms.library.services.AuthorizationServiceImpl;
+import org.mockito.junit.jupiter.MockitoExtension;
+import com.lms.library.dao.UserDao;
+import com.lms.library.entities.User;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-public class AuthorizationServiceImplTest {
-	private static final String SECRET = "ashodhalksdjlasjdlajsdlkajsdlkajsdlkasjdlkajsldjasldkj";
-    
-	@InjectMocks
-    private AuthorizationServiceImpl authorizationService;
-
-    @BeforeEach
-    public void setUp() {
-        ReflectionTestUtils.setField(authorizationService, "secret", SECRET);
-    }
-    
-    @Mock
-    private Key hmacKey;
-
+@ExtendWith(MockitoExtension.class)
+    public class AuthorizationServiceImplTest {
+    private AuthorizationServiceImpl authorizationService = new AuthorizationServiceImpl(); 
+ 
     @Test
-    public void testGenerateToken() {
-        Integer userId = 1;
-        String token = authorizationService.generateToken(userId);
-
-        assertNotNull(token);
-        // You may want to use an appropriate library to decode the token and assert its content
-    }
-
-    @Test
-    public void testVerifyToken() {
-        Integer userId = 1;
-        String token = Jwts.builder()
-                .claim("userId", userId)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 5)) // 5 minutes
-                .signWith(hmacKey, SignatureAlgorithm.HS256)
-                .compact();
-
-        assertTrue(authorizationService.verifyToken(userId, token));
+    void testGenerateToken() {
+    	UserDao userDao = mock(UserDao.class);
+		UserServiceImpl userService = new UserServiceImpl(userDao);
+		String name = "Swapnil";
+		String email = "Swapnil@gmail.com";
+		String passwordHash = "hashedPassword";
+		User expectedUser = new User(name, email, passwordHash);
+		expectedUser.setUserId(1);
+		String token = authorizationService.generateToken(expectedUser.getUserId());
+        assertTrue(authorizationService.verifyToken(expectedUser.getUserId(), token));
     }
 
     @Test
     public void testGenerateAdminToken() {
-        String email = "admin@example.com";
+        String email = "admin9@example.com";
         String token = authorizationService.generateAdminToken(email);
-
-        assertNotNull(token);
-        // You may want to use an appropriate library to decode the token and assert its content
+        assertTrue(authorizationService.verifyAdminToken(email, token));
     }
 
     @Test
-    public void testVerifyAdminToken() {
-        String email = "admin@example.com";
-        String token = Jwts.builder()
-                .claim("email", email)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 5)) // 5 minutes
-                .signWith(hmacKey, SignatureAlgorithm.HS256)
-                .compact();
+    public void testVerifyTokenValid() {
+    	UserDao userDao = mock(UserDao.class);
+		UserServiceImpl userService = new UserServiceImpl(userDao);
+		String name = "Swapnil";
+		String email = "Swapnil@gmail.com";
+		String passwordHash = "hashedPassword";
+		User expectedUser = new User(name, email, passwordHash);
+		expectedUser.setUserId(6);
+		String token = authorizationService.generateToken(expectedUser.getUserId());
+        assertTrue(authorizationService.verifyToken(expectedUser.getUserId(), token));
+    }
 
+    @Test
+    public void testVerifyTokenInvalidUserId() {
+    	UserDao userDao = mock(UserDao.class);
+		UserServiceImpl userService = new UserServiceImpl(userDao);
+		String name = "Swapnil";
+		String email = "Swapnil@gmail.com";
+		String passwordHash = "hashedPassword";
+		User expectedUser = new User(name, email, passwordHash);
+		expectedUser.setUserId(5);
+		String token = authorizationService.generateToken(expectedUser.getUserId());
+        assertFalse(authorizationService.verifyToken(123, token));
+    }
+
+    @Test
+    public void testVerifyTokenInvalidToken() {
+    	UserDao userDao = mock(UserDao.class);
+		UserServiceImpl userService = new UserServiceImpl(userDao);
+		String name = "Swapnil";
+		String email = "Swapnil@gmail.com";
+		String passwordHash = "hashedPassword";
+		User expectedUser = new User(name, email, passwordHash);
+		expectedUser.setUserId(4);
+	    String token = authorizationService.generateToken(5);
+      
+        assertFalse(authorizationService.verifyToken(expectedUser.getUserId(), token));
+    }
+
+    @Test
+    public void testVerifyAdminTokenValid() {
+        String email = "admin3@example.com";
+        String token = authorizationService.generateAdminToken(email);
         assertTrue(authorizationService.verifyAdminToken(email, token));
     }
-}
 
+    @Test
+    public void testVerifyAdminTokenInvalidEmail() {
+        String email = "admin1@example.com";
+        String token = authorizationService.generateAdminToken("another_admin@example.com");
+        assertFalse(authorizationService.verifyAdminToken(email, token));
+    }
+
+    @Test
+    public void testVerifyAdminTokenInvalidToken() {
+        String email = "admin1@example.com";
+        String token =   authorizationService.generateAdminToken("another_admin@example.com");
+        assertFalse(authorizationService.verifyAdminToken(email, token));
+    }
+}

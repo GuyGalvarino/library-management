@@ -17,4 +17,8 @@ public class AdminServiceImpl implements AdminService {
     return adminDao.findById(email).orElse(null);
   }
   
+  public AdminServiceImpl(AdminDao adminDao) {
+	  this.adminDao=adminDao;
+  }
+  
 }

@@ -33,7 +33,7 @@ public class IssueController {
 
 	@GetMapping("/issues/{userId}")
 	public ResponseEntity<?> getIssues(@PathVariable Integer userId, @RequestHeader String authorization) {
-		if(!authorizationService.verifyToken(userId, authorization)) {			
+		if(!authorizationService.verifyToken(userId, authorization)) {
 			return ResponseEntity.status(403).build();
 		}
 		return ResponseEntity.of(Optional.of(issueService.getIssues(userId)));

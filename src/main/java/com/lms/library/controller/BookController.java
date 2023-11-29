@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lms.library.entities.Book;
 import com.lms.library.services.AuthorizationService;
 import com.lms.library.services.BookService;
@@ -23,11 +25,6 @@ public class BookController {
 	public BookService bookService;
 	@Autowired
 	public AuthorizationService authorizationService;
-
-	@GetMapping("/books")
-	public List<Book> getAllBooks() {
-		return bookService.getBooks();
-	}
 
 	public static class BookRequest {
 		private String name;
@@ -58,30 +55,26 @@ public class BookController {
 			this.publisher = publisher;
 			this.adminEmail = adminEmail;
 		}
-		
 
 	}
 
 	public static class BookDeleteRequest {
-		private Integer bookId;
 		private String adminEmail;
-
-		public Integer getBookId() {
-			return bookId;
-		}
 
 		public String getAdminEmail() {
 			return adminEmail;
 		}
 
-		public BookDeleteRequest(Integer bookId, String adminEmail) {
+		@JsonCreator
+		public BookDeleteRequest(@JsonProperty("adminEmail") String adminEmail) {
 			super();
-			this.bookId = bookId;
 			this.adminEmail = adminEmail;
 		}
-		
-		
+	}
 
+	@GetMapping("/books")
+	public List<Book> getAllBooks() {
+		return bookService.getBooks();
 	}
 
 	@GetMapping("/books/{bookId}")
@@ -110,9 +103,8 @@ public class BookController {
 	}
 
 	@DeleteMapping("/books/{bookId}")
-	public ResponseEntity<?> removeBook(@PathVariable BookDeleteRequest bookDeleteRequest,
+	public ResponseEntity<?> removeBook(@PathVariable Integer bookId, @RequestBody BookDeleteRequest bookDeleteRequest,
 			@RequestHeader String authorization) {
-		Integer bookId = bookDeleteRequest.getBookId();
 		String adminEmail = bookDeleteRequest.getAdminEmail();
 		if (!authorizationService.verifyAdminToken(adminEmail, authorization)) {
 			return ResponseEntity.status(403).build();

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.lms.library.dao.AdminDao;
 import com.lms.library.dao.OtpDao;
+import com.lms.library.dao.UserDao;
 import com.lms.library.entities.Admin;
 import com.lms.library.entities.Otp;
 
@@ -29,6 +30,7 @@ public class OtpServiceImpl implements OtpService {
         }
         String passwordHash = BCrypt.withDefaults().hashToString(12, password.toCharArray());
         otpDao.save(new Otp(email, name, passwordHash, otp));
+        // System.out.println(otp);    // for testing frontend
         mailService.sendMail(email, "LMS user verification", "Your OTP is " + otp);
     }
 
@@ -40,6 +42,7 @@ public class OtpServiceImpl implements OtpService {
         }
         admin.setOtp(otp);
         adminDao.save(admin);
+        // System.out.println(otp);    // for testing frontend
         mailService.sendMail(admin.getEmail(), "LMS admin verification", "Your OTP is " + otp);
     }
 
@@ -69,5 +72,18 @@ public class OtpServiceImpl implements OtpService {
         }
         return null;
     }
+    
+    public OtpServiceImpl() {}
+    
+	public OtpServiceImpl(OtpDao otpDao, MailService mailService) {
+		this.otpDao = otpDao;
+		this.mailService = mailService;
+	} 
+	
+	public OtpServiceImpl(OtpDao otpDao, AdminDao adminDao, MailService mailService) {
+		this.adminDao=adminDao;
+		this.otpDao=otpDao;
+		this.mailService = mailService;
+	}
 
 }
