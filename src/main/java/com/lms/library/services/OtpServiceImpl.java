@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import com.lms.library.dao.AdminDao;
 import com.lms.library.dao.OtpDao;
-import com.lms.library.dao.UserDao;
 import com.lms.library.entities.Admin;
 import com.lms.library.entities.Otp;
 
