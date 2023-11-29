@@ -1,4 +1,4 @@
-package com.lms.library;
+package Controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lms.library.controller.BookController;

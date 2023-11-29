@@ -1,7 +1,5 @@
-package com.lms.library;
+package Controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -14,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.lms.library.controller.AdminController;
-import com.lms.library.entities.Admin;
 import com.lms.library.services.AdminService;
 import com.lms.library.services.AuthorizationService;
 import com.lms.library.services.OtpService;
