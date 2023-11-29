@@ -136,12 +136,6 @@ public class UserController {
 		return ResponseEntity.of(Optional.of(new UserResponse(user.getUserId(), user.getName(), user.getEmail())));
 	}
 
-	@GetMapping("/users") // temporary for checking the users in the database
-	public List<User> getUsers() {
-		List<User> userList = userService.getUsers();
-		return userList;
-	}
-
 	@PostMapping(path = "/users/login", consumes = "application/json")
 	public ResponseEntity<?> loginUser(@RequestBody LoginRequest request) {
 		String email = request.getEmail();
