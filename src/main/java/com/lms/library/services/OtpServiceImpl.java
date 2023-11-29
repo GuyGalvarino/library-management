@@ -30,6 +30,7 @@ public class OtpServiceImpl implements OtpService {
         }
         String passwordHash = BCrypt.withDefaults().hashToString(12, password.toCharArray());
         otpDao.save(new Otp(email, name, passwordHash, otp));
+        // System.out.println(otp);    // for testing frontend
         mailService.sendMail(email, "LMS user verification", "Your OTP is " + otp);
     }
 
@@ -41,6 +42,7 @@ public class OtpServiceImpl implements OtpService {
         }
         admin.setOtp(otp);
         adminDao.save(admin);
+        // System.out.println(otp);    // for testing frontend
         mailService.sendMail(admin.getEmail(), "LMS admin verification", "Your OTP is " + otp);
     }
 

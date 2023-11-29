@@ -1,6 +1,7 @@
 package com.lms.library.services;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeAll;
+// import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,14 +22,14 @@ import java.util.Base64;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthorizationServiceImplTest {
-	@Mock
-    private AuthorizationService authorizationService;
+    AuthorizationService authorizationService = new AuthorizationServiceImpl();
 
-    @Before
-    public void setUp() {
-        authorizationService = new AuthorizationServiceImpl(); 
-    }
-    
+    // @BeforeAll // changed from @Before to @BeforeAll as @Before doesn't work with
+    // Maven 3.9.1 + JDK21
+    // public void setUp() {
+    // authorizationService = new AuthorizationServiceImpl();
+    // }
+
     @Test
     void testGenerateToken() {
         Integer userId = 1;
@@ -44,7 +45,7 @@ public class AuthorizationServiceImplTest {
         String token = authorizationService.generateAdminToken(email);
         assertTrue(authorizationService.verifyAdminToken(email, token));
     }
-    
+
     @Test
     public void testVerifyTokenValid() {
         Integer userId = 456;
@@ -53,7 +54,7 @@ public class AuthorizationServiceImplTest {
         String token = authorizationService.generateToken(userId);
         assertTrue(authorizationService.verifyToken(userId, token));
     }
-    
+
     @Test
     public void testVerifyTokenInvalidUserId() {
         Integer userId = 789;
@@ -68,10 +69,10 @@ public class AuthorizationServiceImplTest {
         Integer userId = 123;
         User mockUser = new User();
         mockUser.setUserId(userId);
-        String token = "invalid_token";
+        String token = authorizationService.generateToken(124);
         assertFalse(authorizationService.verifyToken(userId, token));
     }
-    
+
     @Test
     public void testVerifyAdminTokenValid() {
         String email = "admin@example.com";
@@ -89,7 +90,7 @@ public class AuthorizationServiceImplTest {
     @Test
     public void testVerifyAdminTokenInvalidToken() {
         String email = "admin@example.com";
-        String token = "invalid_token";
+        String token = authorizationService.generateAdminToken("notadmin@example.com");
         assertFalse(authorizationService.verifyAdminToken(email, token));
     }
 }

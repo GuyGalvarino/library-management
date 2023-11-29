@@ -1,6 +1,9 @@
 package com.lms.library.services;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue; // works in Maven 3.9.1 + JDK21
+
+// import static org.junit.Assert.assertTrue;   // does not work in Maven 3.9.1 + JDK21
+
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
