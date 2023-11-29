@@ -1,4 +1,4 @@
-package Controller;
+package com.lms.library.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -43,7 +43,9 @@ public class UserControllerTest {
         when(authorizationService.verifyToken(any(), any())).thenReturn(true);
 
         // Mock the behavior of userService
-        when(userService.getUserByEmail(any())).thenReturn(new User("John Doe", "john@example.com", "hashedPassword"));
+        User user = new User("John Doe", "john@example.com", "hashedPassword");
+        user.setUserId(1);
+        when(userService.getUserByEmail(any())).thenReturn(user);
 
         mockMvc.perform(get("/users/{email}", "john@example.com")
                 .header("Authorization", "Bearer validToken")
@@ -57,10 +59,14 @@ public class UserControllerTest {
     @Test
     public void testLoginUser_Success() throws Exception {
         // Mock the behavior of userService
-        when(userService.getUserByEmail(any())).thenReturn(new User("John Doe", "john@example.com", "hashedPassword"));
+        // a password hash for "password123" is "$2a$12$iuRlmXWwOAhLEndopzhskODvnQT3MWcP66l0H0F7Lqbsw5teBSslq"
+        User user = new User("John Doe", "john@example.com", "$2a$12$iuRlmXWwOAhLEndopzhskODvnQT3MWcP66l0H0F7Lqbsw5teBSslq");
+        user.setUserId(1);
+        when(userService.getUserByEmail(any())).thenReturn(user);
+        when(authorizationService.generateToken(any())).thenReturn("testToken");
 
         mockMvc.perform(post("/users/login")
-                .content("{\"email\": \"john@example.com\", \"password\": \"password\"}")
+                .content("{\"email\": \"john@example.com\", \"password\": \"password123\"}")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userId").exists())
@@ -85,7 +91,11 @@ public class UserControllerTest {
     public void testVerifyUser_Success() throws Exception {
         // Mock the behavior of otpService
         when(otpService.verifyOtp(any(), any())).thenReturn(new Otp("john@example.com" , "John Doe", "hashedPassword","123456"));
-
+        User user = new User("John Doe", "john@example.com", "$2a$12$iuRlmXWwOAhLEndopzhskODvnQT3MWcP66l0H0F7Lqbsw5teBSslq");
+        user.setUserId(1);
+        when(userService.getUserByEmail(any())).thenReturn(null);
+        when(authorizationService.generateToken(any())).thenReturn("testToken");
+        when(userService.createUser(any(), any(), any())).thenReturn(user);
         mockMvc.perform(post("/users/verify-otp")
                 .content("{\"otp\": \"123456\", \"email\": \"john@example.com\"}")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -102,7 +112,9 @@ public class UserControllerTest {
         when(authorizationService.verifyToken(any(), any())).thenReturn(true);
 
         // Mock the behavior of userService
-        when(userService.deleteUser(any())).thenReturn(new User("John Doe", "john@example.com", "hashedPassword"));
+        User user = new User("John Doe", "john@example.com", "hashedPassword");
+        user.setUserId(1);
+        when(userService.deleteUser(any())).thenReturn(user);
 
         mockMvc.perform(delete("/users/{userId}", 123)
                 .header("Authorization", "Bearer validToken")

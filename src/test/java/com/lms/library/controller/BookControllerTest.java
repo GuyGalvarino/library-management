@@ -1,4 +1,4 @@
-package Controller;
+package com.lms.library.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lms.library.controller.BookController;
@@ -9,9 +9,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
 import java.util.Collections;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -57,10 +60,11 @@ public class BookControllerTest {
     @Test
     public void testAddBook() throws Exception {
         when(bookService.addBook(any(), any(), any())).thenReturn(new Book("NewBook", "NewAuthor", "NewPublisher"));
-
+        when(authorizationService.verifyAdminToken(any(), any())).thenReturn(true);
         mockMvc.perform(post("/books")
-                .content(objectMapper.writeValueAsString(new BookController.BookRequest("NewBook", "NewAuthor", "NewPublisher","admin@example.com")))
-                .contentType(MediaType.APPLICATION_JSON))
+                        .header(HttpHeaders.AUTHORIZATION, "testToken")
+                        .content(objectMapper.writeValueAsString(new BookController.BookRequest("NewBook", "NewAuthor", "NewPublisher", "admin@example.com")))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("NewBook"))
                 .andExpect(jsonPath("$.author").value("NewAuthor"))

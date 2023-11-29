@@ -1,4 +1,4 @@
-package Controller;
+package com.lms.library.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
