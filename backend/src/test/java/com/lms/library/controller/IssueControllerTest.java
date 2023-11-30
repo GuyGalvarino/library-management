@@ -17,7 +17,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.lms.library.controller.IssueController;
 import com.lms.library.entities.Book;
 import com.lms.library.services.AuthorizationService;
 import com.lms.library.services.IssueService;
@@ -36,10 +35,7 @@ public class IssueControllerTest {
 
     @Test
     public void testGetIssues_Success() throws Exception {
-        // Mock the behavior of authorizationService as needed
         when(authorizationService.verifyToken(any(), any())).thenReturn(true);
-
-        // Mock the behavior of issueService
         when(issueService.getIssues(any())).thenReturn(Arrays.asList(new Book("Book1", "Author1", "Publisher1")));
 
         mockMvc.perform(get("/issues/{userId}", 123)
@@ -54,10 +50,7 @@ public class IssueControllerTest {
 
     @Test
     public void testAddIssue_Success() throws Exception {
-        // Mock the behavior of authorizationService as needed
         when(authorizationService.verifyToken(any(), any())).thenReturn(true);
-
-        // Mock the behavior of issueService
         when(issueService.addIssue(any(), any())).thenReturn(new Book("NewBook", "NewAuthor", "NewPublisher"));
 
         mockMvc.perform(post("/issues/{userId}", 456)
@@ -72,10 +65,7 @@ public class IssueControllerTest {
 
     @Test
     public void testRemoveIssue_Success() throws Exception {
-        // Mock the behavior of authorizationService as needed
         when(authorizationService.verifyToken(any(), any())).thenReturn(true);
-
-        // Mock the behavior of issueService
         when(issueService.removeIssue(any(), any())).thenReturn(new Book("RemovedBook", "RemovedAuthor", "RemovedPublisher"));
 
         mockMvc.perform(delete("/issues/{userId}", 789)

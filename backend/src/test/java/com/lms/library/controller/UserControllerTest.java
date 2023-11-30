@@ -15,7 +15,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.lms.library.controller.UserController;
 import com.lms.library.entities.Otp;
 import com.lms.library.entities.User;
 import com.lms.library.services.AuthorizationService;
@@ -39,10 +38,7 @@ public class UserControllerTest {
 
     @Test
     public void testGetUser_Success() throws Exception {
-        // Mock the behavior of authorizationService as needed
         when(authorizationService.verifyToken(any(), any())).thenReturn(true);
-
-        // Mock the behavior of userService
         User user = new User("John Doe", "john@example.com", "hashedPassword");
         user.setUserId(1);
         when(userService.getUserByEmail(any())).thenReturn(user);
@@ -58,7 +54,6 @@ public class UserControllerTest {
 
     @Test
     public void testLoginUser_Success() throws Exception {
-        // Mock the behavior of userService
         // a password hash for "password123" is "$2a$12$iuRlmXWwOAhLEndopzhskODvnQT3MWcP66l0H0F7Lqbsw5teBSslq"
         User user = new User("John Doe", "john@example.com", "$2a$12$iuRlmXWwOAhLEndopzhskODvnQT3MWcP66l0H0F7Lqbsw5teBSslq");
         user.setUserId(1);
@@ -77,7 +72,6 @@ public class UserControllerTest {
 
     @Test
     public void testSigninUser_Success() throws Exception {
-        // Mock the behavior of userService
         when(userService.getUserByEmail(any())).thenReturn(null);
 
         mockMvc.perform(post("/users/signin")
@@ -89,7 +83,6 @@ public class UserControllerTest {
 
     @Test
     public void testVerifyUser_Success() throws Exception {
-        // Mock the behavior of otpService
         when(otpService.verifyOtp(any(), any())).thenReturn(new Otp("john@example.com" , "John Doe", "hashedPassword","123456"));
         User user = new User("John Doe", "john@example.com", "$2a$12$iuRlmXWwOAhLEndopzhskODvnQT3MWcP66l0H0F7Lqbsw5teBSslq");
         user.setUserId(1);
@@ -108,10 +101,7 @@ public class UserControllerTest {
 
     @Test
     public void testDeleteUser_Success() throws Exception {
-        // Mock the behavior of authorizationService as needed
         when(authorizationService.verifyToken(any(), any())).thenReturn(true);
-
-        // Mock the behavior of userService
         User user = new User("John Doe", "john@example.com", "hashedPassword");
         user.setUserId(1);
         when(userService.deleteUser(any())).thenReturn(user);
