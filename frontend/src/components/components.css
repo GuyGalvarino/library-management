@@ -1,0 +1,25 @@
+.list-item {
+  border: 2px white solid;
+}
+
+.list-header {
+  padding-bottom: 20px;
+  padding-left: 20px;
+  border-bottom: 1px gray solid;
+}
+
+.list-body {
+  display: inline-block;
+  padding-bottom: 20px;
+  padding-left: 20px;
+}
+
+.list {
+  overflow-y: scroll;
+  padding-left: 20px;
+  padding-top: 20px;
+}
+
+.list-function {
+  margin-left: 20px;
+}
