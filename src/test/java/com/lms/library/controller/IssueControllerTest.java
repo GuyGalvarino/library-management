@@ -35,10 +35,7 @@ public class IssueControllerTest {
 
     @Test
     public void testGetIssues_Success() throws Exception {
-        // Mock the behavior of authorizationService as needed
         when(authorizationService.verifyToken(any(), any())).thenReturn(true);
-
-        // Mock the behavior of issueService
         when(issueService.getIssues(any())).thenReturn(Arrays.asList(new Book("Book1", "Author1", "Publisher1")));
 
         mockMvc.perform(get("/issues/{userId}", 123)
@@ -53,10 +50,7 @@ public class IssueControllerTest {
 
     @Test
     public void testAddIssue_Success() throws Exception {
-        // Mock the behavior of authorizationService as needed
         when(authorizationService.verifyToken(any(), any())).thenReturn(true);
-
-        // Mock the behavior of issueService
         when(issueService.addIssue(any(), any())).thenReturn(new Book("NewBook", "NewAuthor", "NewPublisher"));
 
         mockMvc.perform(post("/issues/{userId}", 456)
@@ -71,10 +65,7 @@ public class IssueControllerTest {
 
     @Test
     public void testRemoveIssue_Success() throws Exception {
-        // Mock the behavior of authorizationService as needed
         when(authorizationService.verifyToken(any(), any())).thenReturn(true);
-
-        // Mock the behavior of issueService
         when(issueService.removeIssue(any(), any())).thenReturn(new Book("RemovedBook", "RemovedAuthor", "RemovedPublisher"));
 
         mockMvc.perform(delete("/issues/{userId}", 789)

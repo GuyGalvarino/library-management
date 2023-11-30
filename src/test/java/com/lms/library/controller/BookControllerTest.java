@@ -1,6 +1,7 @@
 package com.lms.library.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lms.library.controller.BookController.BookDeleteRequest;
 import com.lms.library.entities.Book;
 import com.lms.library.services.AuthorizationService;
 import com.lms.library.services.BookService;
@@ -9,9 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -34,6 +37,9 @@ public class BookControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private BookController bookController;
+
     @Test
     public void testGetAllBooks() throws Exception {
         when(bookService.getBooks()).thenReturn(Collections.singletonList(new Book("Book1", "Author1", "Publisher1")));
@@ -47,7 +53,7 @@ public class BookControllerTest {
 
     @Test
     public void testGetBookById() throws Exception {
-        when(bookService.getBook(1)).thenReturn(new Book("Book1", "Author1", "Publisher1"));
+        when(bookService.getBook(any())).thenReturn(new Book("Book1", "Author1", "Publisher1"));
 
         mockMvc.perform(get("/books/1"))
                 .andExpect(status().isOk())
@@ -69,6 +75,43 @@ public class BookControllerTest {
                 .andExpect(jsonPath("$.author").value("NewAuthor"))
                 .andExpect(jsonPath("$.publisher").value("NewPublisher"));
     }
+    @Test
+    public void testRemoveBook() {
+        Integer bookId = 1;
+        String adminEmail = "admin@example.com";
+        String authorizationToken = "testToken";
+        BookDeleteRequest bookDeleteRequest = new BookDeleteRequest(adminEmail);
+        Book removedBook = new Book("RemovedBook", "RemovedAuthor", "RemovedPublisher");
+        when(authorizationService.verifyAdminToken(adminEmail, authorizationToken)).thenReturn(true);
+        when(bookService.removeBook(bookId)).thenReturn(removedBook);
+        ResponseEntity<?> responseEntity = bookController.removeBook(bookId, bookDeleteRequest, authorizationToken);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getBody()).isEqualTo(removedBook);
+    }
 
-    // Add tests for other endpoints as needed
+    @Test
+    public void testRemoveBookUnauthorized() {
+        Integer bookId = 1;
+        String adminEmail = "admin@example.com";
+        String authorizationToken = "invalidToken";
+        BookDeleteRequest bookDeleteRequest = new BookDeleteRequest(adminEmail);
+
+        when(authorizationService.verifyAdminToken(adminEmail, authorizationToken)).thenReturn(false);
+        ResponseEntity<?> responseEntity = bookController.removeBook(bookId, bookDeleteRequest, authorizationToken);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(responseEntity.getBody()).isNull();
+    }
+
+    @Test
+    public void testRemoveBookNotFound() {
+        Integer bookId = 1;
+        String adminEmail = "admin@example.com";
+        String authorizationToken = "testToken";
+        BookDeleteRequest bookDeleteRequest = new BookDeleteRequest(adminEmail);
+        when(authorizationService.verifyAdminToken(adminEmail, authorizationToken)).thenReturn(true);
+        when(bookService.removeBook(bookId)).thenReturn(null);
+        ResponseEntity<?> responseEntity = bookController.removeBook(bookId, bookDeleteRequest, authorizationToken);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(responseEntity.getBody()).isNull();
+    }
 }

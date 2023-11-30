@@ -37,8 +37,7 @@ public class AdminControllerTest {
         // a password hash for "password123" is "$2a$12$iuRlmXWwOAhLEndopzhskODvnQT3MWcP66l0H0F7Lqbsw5teBSslq"
         Admin admin = new Admin("admin@example.com", "admin", "$2a$12$iuRlmXWwOAhLEndopzhskODvnQT3MWcP66l0H0F7Lqbsw5teBSslq");
         when(adminService.getAdmin("admin@example.com")).thenReturn(admin);
-        mockMvc.perform(post("/admin")
-                        .content("{\"email\":\"admin@example.com\", \"password\":\"password123\"}")
+        mockMvc.perform(post("/admin").content("{\"email\":\"admin@example.com\", \"password\":\"password123\"}")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("OTP sent to the email of the admin"));
